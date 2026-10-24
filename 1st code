@@ -1,0 +1,57 @@
+import streamlit as st
+import pandas as pd
+
+# Initialize session state
+if "expenses" not in st.session_state:
+    st.session_state.expenses = []
+
+
+def add_expense(amount, category):
+    st.session_state.expenses.append({
+        "amount": amount,
+        "category": category
+    })
+
+
+def view_expenses():
+    return pd.DataFrame(st.session_state.expenses)
+
+
+def main():
+    st.title("Simple Expense Manager")
+
+    # Add Expense
+    st.header("Add New Expense")
+
+    amount = st.number_input(
+        "Amount",
+        min_value=0.01,
+        step=0.01
+    )
+
+    category = st.text_input("Category")
+
+    if st.button("Add Expense"):
+        if category.strip():
+            add_expense(amount, category.strip())
+            st.success("Expense added successfully!")
+        else:
+            st.warning("Please enter a category.")
+
+    # View Expenses
+    st.header("Expense List")
+
+    df = view_expenses()
+
+    if not df.empty:
+        st.dataframe(df)
+
+        total = df["amount"].sum()
+
+        st.info(f"Total Expenses: ${total:.2f}")
+    else:
+        st.info("No expenses added yet.")
+
+
+if __name__ == "__main__":
+    main()
